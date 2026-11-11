@@ -1,6 +1,9 @@
 #include <QCoreApplication>
 #include "CarlinkDongle.h"
 #include "CarAudio.h"
+#include "AaClient.h"
+#include "AaCert.h"
+#include <QStandardPaths>
 
 #include <QDateTime>
 #include <QDebug>
@@ -61,6 +64,7 @@ CarlinkDongle::CarlinkDongle(QObject *parent) : QObject(parent)
     loadSettings();
     m_mic = new CarMic(this);
     m_mic->onPcm = [this](const QByteArray &pcm) {
+        if (m_native && m_native->running()) { m_native->micData(pcm); return; }
         if (!m_sessionUp) return;
         // voice to the phone: type 5 (16 kHz mono), volume 0, "input" channel 3
         sendPacket(AUDIO, le32(5) + lef32(0.0f) + le32(3) + pcm);
@@ -80,10 +84,12 @@ void CarlinkDongle::setEnabled(bool on)
 {
     if (m_enabled == on) return;
     m_enabled = on;
-    m_wantEnabled = on;
-    if (!on) m_dropSession = true;
+    const bool native = m_source != QLatin1String("dongle");
+    m_wantEnabled = on && !native;
+    if (!on || native) m_dropSession = true;
     emit enabledChanged();
     setState(on ? QStringLiteral("searching") : QStringLiteral("off"));
+    if (native) { if (on) startNative(); else stopNative(); }
 }
 
 QObject *CarlinkDongle::videoSink() const { return m_sink.data(); }
@@ -108,6 +114,9 @@ void CarlinkDongle::loadSettings()
     m_fitFull = q.value(QStringLiteral("fitFull"), QStringLiteral("fill")).toString();
     if (m_fitSmall != QLatin1String("fill")) m_fitSmall = QStringLiteral("fit");   // "ritaglia" tolto
     if (m_fitFull != QLatin1String("fit")) m_fitFull = QStringLiteral("fill");
+    QString src = q.value(QStringLiteral("source"), QStringLiteral("dongle")).toString();
+    if (qEnvironmentVariableIsSet("VOLTA_AA_SOURCE")) src = qEnvironmentVariable("VOLTA_AA_SOURCE");   // tests
+    m_source = (src == QLatin1String("usb") || src == QLatin1String("wireless")) ? src : QStringLiteral("dongle");
     m_resolutionA = m_resolution;
     m_dpiA = m_dpi;
     applyNight();
@@ -121,6 +130,7 @@ void CarlinkDongle::saveSettings()
     q.setValue(QStringLiteral("theme"), m_theme);
     q.setValue(QStringLiteral("fitSmall"), m_fitSmall);
     q.setValue(QStringLiteral("fitFull"), m_fitFull);
+    q.setValue(QStringLiteral("source"), m_source);
 }
 
 void CarlinkDongle::applyNight()
@@ -129,7 +139,10 @@ void CarlinkDongle::applyNight()
                 : m_theme == QLatin1String("dark")  ? 1
                 : m_theme == QLatin1String("auto")  ? 2
                 : (m_uiLight ? 0 : 1);
-    if (m_nightValue.exchange(v) != v && m_sessionUp) sendNight();
+    if (m_nightValue.exchange(v) != v) {
+        if (m_sessionUp) sendNight();
+        if (m_native && m_native->running()) m_native->setNight(v == 1);
+    }
 }
 
 // The theme is changed on the fly with a command (night/day); the file is used at startup and for "auto"
@@ -147,12 +160,14 @@ void CarlinkDongle::setResolution(int r)
     if (m_resolution == r) return;
     m_resolution = r; m_resolutionA = r;
     saveSettings(); emit settingsChanged();
+    if (m_native && m_native->running()) { stopNative(); startNative(); }
 }
 void CarlinkDongle::setDpi(int d)
 {
     if (m_dpi == d) return;
     m_dpi = d; m_dpiA = d;
     saveSettings(); emit settingsChanged();
+    if (m_native && m_native->running()) { stopNative(); startNative(); }
 }
 void CarlinkDongle::setTheme(const QString &t)
 {
@@ -181,10 +196,21 @@ void CarlinkDongle::setViewSize(int w, int h)
     if (w > 50 && h > 50) { m_viewW = w; m_viewH = h; }
 }
 
-void CarlinkDongle::restart() { m_dropSession = true; }
+void CarlinkDongle::restart()
+{
+    m_dropSession = true;
+    if (m_source != QLatin1String("dongle") && m_enabled) { stopNative(); startNative(); }
+}
 
 void CarlinkDongle::key(const QString &name)
 {
+    if (m_native && m_native->running()) {                  // Android key codes
+        static const QHash<QString, int> codes = {
+            {QStringLiteral("home"), 3}, {QStringLiteral("back"), 4}, {QStringLiteral("playpause"), 85},
+            {QStringLiteral("next"), 87}, {QStringLiteral("prev"), 88}, {QStringLiteral("siri"), 84}};
+        if (codes.contains(name)) { m_native->key(codes.value(name), true); m_native->key(codes.value(name), false); }
+        return;
+    }
     if (!m_sessionUp) return;
     static const QHash<QString, quint32> map = {
         {QStringLiteral("home"), CMD_HOME}, {QStringLiteral("back"), CMD_BACK},
@@ -570,6 +596,7 @@ void CarlinkDongle::handleAudio(const QByteArray &data)
 
 void CarlinkDongle::touch(int action, double x, double y)
 {
+    if (m_native && m_native->running()) { m_native->touch(action, x, y); return; }
     if (!m_sessionUp) return;
     static int logged = 0;
     if (logged < 12) { ++logged; qInfo() << "[Carlink] tocco" << action << x << y; }
@@ -584,4 +611,95 @@ void CarlinkDongle::touch(int action, double x, double y)
     const quint32 act = action == 0 ? 1 : action == 1 ? 0 : 2;
     sendPacket(MULTITOUCH, lef32(float(qBound(0.0, x, 1.0))) + lef32(float(qBound(0.0, y, 1.0)))
                                + le32(act) + le32(0));
+}
+
+
+// ─────────────── native Android Auto (no dongle) ───────────────
+void CarlinkDongle::setSource(const QString &s)
+{
+    const QString v = (s == QLatin1String("usb") || s == QLatin1String("wireless")) ? s : QStringLiteral("dongle");
+    if (m_source == v) return;
+    m_source = v;
+    saveSettings();
+    emit settingsChanged();
+    applySource();
+}
+
+void CarlinkDongle::applySource()
+{
+    const bool native = m_source != QLatin1String("dongle");
+    m_wantEnabled = m_enabled && !native;
+    if (native) m_dropSession = true;                       // lets go of the dongle if it was in use
+    stopNative();
+    m_phoneKind.clear(); m_phoneName.clear();
+    setState(m_enabled ? QStringLiteral("searching") : QStringLiteral("off"));
+    if (native && m_enabled) startNative();
+}
+
+void CarlinkDongle::stopNative()
+{
+    if (m_native) m_native->stop();
+    setVideoActive(false);
+    for (CarAudioOut *a : std::as_const(m_audio)) if (a) a->stop();
+    m_mic->stop();
+}
+
+void CarlinkDongle::startNative()
+{
+    if (!m_native) {
+        m_native = new AaClient(this);
+        m_native->onVideo = [this](const QByteArray &h264) { m_decoder.decode(h264); };   // worker thread
+        connect(m_native, &AaClient::status, this, [this](const QString &st, const QString &detail) {
+            // searching / probing / permission / connecting / running / error -> the states the UI knows
+            if (st == QLatin1String("probing")) setState(QStringLiteral("starting"));
+            else if (st == QLatin1String("permission")) setState(QStringLiteral("error"), QStringLiteral("permission"));
+            else if (st == QLatin1String("searching")) setState(QStringLiteral("searching"));
+            else setState(st, detail);
+            m_sessionUp = (st == QLatin1String("running"));
+        });
+        connect(m_native, &AaClient::phoneName, this, [this](const QString &n) {
+            m_phoneKind = QStringLiteral("Android Auto");
+            m_phoneName = n;
+            emit stateChanged();
+        });
+        connect(m_native, &AaClient::videoActive, this, [this](bool on) { setVideoActive(on); });
+        connect(m_native, &AaClient::videoSize, this, [this](int w, int h) {
+            if (m_videoSize != QSize(w, h)) { m_videoSize = QSize(w, h); emit videoSizeChanged(); }
+        });
+        connect(m_native, &AaClient::audioPcm, this, &CarlinkDongle::handleNativeAudio);
+        connect(m_native, &AaClient::audioStop, this, [this](int stream) {
+            const int type = stream == 3 ? 4 : stream;
+            if (CarAudioOut *a = m_audio.value(type)) a->stop();
+            if (stream == 1 && m_mediaPlaying) { m_mediaPlaying = false; emit mediaAudioActiveChanged(false); }
+        });
+        connect(m_native, &AaClient::microphone, this, [this](bool open) { if (open) m_mic->start(); else m_mic->stop(); });
+    }
+    AaSession::Config c;
+    c.videoW = m_resolution == 1 ? 800 : m_resolution == 2 ? 1280 : 1920;
+    c.videoH = m_resolution == 1 ? 480 : m_resolution == 2 ? 720 : 1080;
+    c.fps = 30;
+    c.dpi = m_dpi > 0 ? m_dpi : (m_resolution == 1 ? 140 : m_resolution == 2 ? 160 : 240);
+    c.theme = m_theme == QLatin1String("light") ? 1 : m_theme == QLatin1String("dark") ? 2
+            : m_theme == QLatin1String("auto") ? 0 : (m_uiLight ? 1 : 2);
+    c.night = m_nightValue.load() == 1;
+    QString err;
+    if (!aaLoadCertificate(&c.certPem, &c.keyPem, QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
+                                                     + QStringLiteral("/volta_os"), &err)) {
+        setState(QStringLiteral("error"), err);
+        return;
+    }
+    m_decoder.reset();
+    if (m_videoSize != QSize(c.videoW, c.videoH)) { m_videoSize = QSize(c.videoW, c.videoH); emit videoSizeChanged(); }
+    m_native->start(m_source == QLatin1String("wireless") ? AaClient::Wireless : AaClient::Usb, c);
+}
+
+// PCM from the phone: media = 1, navigation prompts = 2, system sounds = 4 (3 is the microphone)
+void CarlinkDongle::handleNativeAudio(int stream, int rate, int channels, const QByteArray &pcm)
+{
+    const int type = stream == 3 ? 4 : stream;
+    CarAudioOut *&a = m_audio[type];
+    if (a && (a->rate() != rate || a->channels() != channels)) { a->stop(); a->deleteLater(); a = nullptr; }
+    if (!a) a = new CarAudioOut(rate, channels, this);
+    a->push(pcm);
+    if (stream == 1 && !m_mediaPlaying) { m_mediaPlaying = true; emit mediaAudioActiveChanged(true); }
 }

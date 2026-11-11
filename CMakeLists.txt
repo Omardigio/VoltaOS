@@ -42,6 +42,23 @@ set(VOLTA_EXTRA_QML_FILES qml/VoltaInputPanel.qml)
 # nothing the second time) so as not to touch anything else in that section.
 find_package(Qt6 OPTIONAL_COMPONENTS WaylandCompositor QUIET)
 
+# ── Native Android Auto (src/androidauto) ─────────────────────────────────────
+# The messages of the protocol (third_party/aap_protobuf, from the aasdk library, GPLv3) are compiled
+# once in their own library; the head unit certificate is baked into AaCert.cpp.
+find_package(Protobuf REQUIRED)
+find_package(OpenSSL REQUIRED)
+file(GLOB_RECURSE AAP_PROTOS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/aap_protobuf/aap_protobuf/*.proto)
+add_library(aap_protobuf STATIC)
+protobuf_generate(TARGET aap_protobuf PROTOS ${AAP_PROTOS} IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/aap_protobuf)
+target_include_directories(aap_protobuf PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(aap_protobuf PUBLIC protobuf::libprotobuf)
+target_compile_options(aap_protobuf PRIVATE -w)
+set_target_properties(aap_protobuf PROPERTIES POSITION_INDEPENDENT_CODE ON AUTOMOC OFF AUTOUIC OFF AUTORCC OFF)
+file(READ third_party/aap_cert/headunit.crt AA_CERT_PEM)
+file(READ third_party/aap_cert/headunit.key AA_KEY_PEM)
+configure_file(src/androidauto/AaCert.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/AaCert.cpp @ONLY)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS third_party/aap_cert/headunit.crt third_party/aap_cert/headunit.key)
+
 # ── Executable ────────────────────────────────────────────────────────────────
 qt_add_executable(VoltaOS
     src/main.cpp
@@ -50,6 +67,14 @@ qt_add_executable(VoltaOS
     src/core/SetupManager.h
     src/core/UpdateManager.cpp
     src/core/UpdateManager.h
+    src/androidauto/AaFraming.cpp
+    src/androidauto/AaTls.cpp
+    src/androidauto/AaSession.cpp
+    src/androidauto/AaSession.h
+    src/androidauto/AaUsb.cpp
+    src/androidauto/AaClient.cpp
+    src/androidauto/AaClient.h
+    ${CMAKE_CURRENT_BINARY_DIR}/AaCert.cpp
     src/core/LanguageManager.cpp
     src/core/CarModelManager.cpp
     src/core/ServiceManager.cpp
@@ -483,7 +508,8 @@ if(TARGET Qt6::QuickPrivate)
     target_link_libraries(VoltaOS PRIVATE Qt6::QuickPrivate)
     target_compile_definitions(VoltaOS PRIVATE VOLTA_HAS_DIRTYPROBE)
 endif()
-target_link_libraries(VoltaOS PRIVATE Qt6::OpenGL)
+target_link_libraries(VoltaOS PRIVATE Qt6::OpenGL aap_protobuf OpenSSL::SSL OpenSSL::Crypto)
+target_include_directories(VoltaOS PRIVATE src/androidauto)
 # version shown in Settings > Updates and compared with the latest GitHub release
 target_compile_definitions(VoltaOS PRIVATE VOLTA_VERSION="${PROJECT_VERSION}")
 

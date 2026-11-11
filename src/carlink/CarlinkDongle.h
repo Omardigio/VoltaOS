@@ -27,6 +27,7 @@ struct libusb_device_handle;
 class QVideoSink;
 class CarAudioOut;
 class CarMic;
+class AaClient;
 
 class CarlinkDongle : public QObject {
     Q_OBJECT
@@ -36,6 +37,9 @@ class CarlinkDongle : public QObject {
     Q_PROPERTY(QString state READ state NOTIFY stateChanged)
     Q_PROPERTY(QString detail READ detail NOTIFY stateChanged)
     // "CarPlay" | "Android Auto" | ""
+    // How the phone connects: "dongle" (Carlinkit, CarPlay + Android Auto), "usb" (Android Auto
+    // native, phone plugged in with a cable) or "wireless" (Android Auto native over Wi-Fi)
+    Q_PROPERTY(QString source READ source WRITE setSource NOTIFY settingsChanged)
     Q_PROPERTY(QString phoneKind READ phoneKind NOTIFY stateChanged)
     Q_PROPERTY(QString phoneName READ phoneName NOTIFY stateChanged)
     Q_PROPERTY(bool videoActive READ videoActive NOTIFY videoActiveChanged)
@@ -60,6 +64,8 @@ public:
     void setEnabled(bool on);
     QString state() const { return m_state; }
     QString detail() const { return m_detail; }
+    QString source() const { return m_source; }
+    void setSource(const QString &s);
     QString phoneKind() const { return m_phoneKind; }
     QString phoneName() const { return m_phoneName; }
     bool videoActive() const { return m_videoActive; }
@@ -145,6 +151,13 @@ private:
     std::atomic<int> m_dpiA{0};
     void loadSettings();
     void saveSettings();
+    // ── native Android Auto (src/androidauto) ──
+    void startNative();
+    void stopNative();
+    void applySource();
+    void handleNativeAudio(int stream, int rate, int channels, const QByteArray &pcm);
+    QString m_source = QStringLiteral("dongle");
+    AaClient *m_native = nullptr;
     void applyNight();
     void sendNight();
     libusb_context *m_usb = nullptr;

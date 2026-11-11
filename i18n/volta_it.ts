@@ -4,47 +4,89 @@
 <context>
     <name>AndroidAutoView</name>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="109" />
+        <location filename="../qml/AndroidAutoView.qml" line="119" />
         <source>Starting the dongle…</source>
         <translation>Avvio del dongle…</translation>
     </message>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="110" />
+        <location filename="../qml/AndroidAutoView.qml" line="115" />
+        <location filename="../qml/AndroidAutoView.qml" line="120" />
         <source>Connect your phone</source>
         <translation>Collega il telefono</translation>
     </message>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="111" />
+        <location filename="../qml/AndroidAutoView.qml" line="121" />
         <source>Connecting to </source>
         <translation>Connessione a </translation>
     </message>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="111" />
+        <location filename="../qml/AndroidAutoView.qml" line="121" />
         <source>Connecting…</source>
         <translation>Connessione in corso…</translation>
     </message>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="112" />
+        <location filename="../qml/AndroidAutoView.qml" line="113" />
+        <location filename="../qml/AndroidAutoView.qml" line="122" />
         <source>Starting…</source>
         <translation>Avvio…</translation>
     </message>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="113" />
+        <location filename="../qml/AndroidAutoView.qml" line="111" />
+        <source>Preparing the phone…</source>
+        <translation>Preparo il telefono…</translation>
+    </message>
+    <message>
+        <location filename="../qml/AndroidAutoView.qml" line="112" />
+        <source>Connecting to Android Auto…</source>
+        <translation>Mi collego ad Android Auto…</translation>
+    </message>
+    <message>
+        <location filename="../qml/AndroidAutoView.qml" line="114" />
+        <source>Cannot reach the phone</source>
+        <translation>Impossibile raggiungere il telefono</translation>
+    </message>
+    <message>
+        <location filename="../qml/AndroidAutoView.qml" line="114" />
+        <source>Android Auto problem</source>
+        <translation>Problema con Android Auto</translation>
+    </message>
+    <message>
+        <location filename="../qml/AndroidAutoView.qml" line="115" />
+        <source>Waiting for your phone</source>
+        <translation>In attesa del telefono</translation>
+    </message>
+    <message>
+        <location filename="../qml/AndroidAutoView.qml" line="123" />
         <source>Dongle unavailable</source>
         <translation>Dongle non disponibile</translation>
     </message>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="114" />
+        <location filename="../qml/AndroidAutoView.qml" line="124" />
         <source>Connect the USB dongle</source>
         <translation>Collega il dongle USB</translation>
     </message>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="119" />
+        <location filename="../qml/AndroidAutoView.qml" line="132" />
+        <source>Volta OS is not allowed to use the phone over USB. Install the udev rule from the documentation (51-volta-android-auto.rules), then unplug the phone and plug it in again.</source>
+        <translation>Volta OS non può usare il telefono via USB. Installa la regola udev indicata nella documentazione (51-volta-android-auto.rules), poi scollega e ricollega il telefono.</translation>
+    </message>
+    <message>
+        <location filename="../qml/AndroidAutoView.qml" line="137" />
+        <source>Waiting for your phone to connect over Wi-Fi.</source>
+        <translation>Aspetto che il telefono si colleghi via Wi-Fi.</translation>
+    </message>
+    <message>
+        <location filename="../qml/AndroidAutoView.qml" line="138" />
+        <source>Plug your Android phone into a USB port with a data cable. The Android Auto app must be installed.</source>
+        <translation>Collega il telefono Android a una porta USB con un cavo dati. L'app Android Auto deve essere installata.</translation>
+    </message>
+    <message>
+        <location filename="../qml/AndroidAutoView.qml" line="143" />
         <source>Turn on Bluetooth on your phone and connect it to the dongle: CarPlay or Android Auto start by themselves.</source>
         <translation>Attiva il Bluetooth sul telefono e collegalo al dongle: CarPlay o Android Auto partono da soli.</translation>
     </message>
     <message>
-        <location filename="../qml/AndroidAutoView.qml" line="122" />
+        <location filename="../qml/AndroidAutoView.qml" line="146" />
         <source>Plug the Carlinkit dongle into a USB port.</source>
         <translation>Inserisci il dongle Carlinkit in una porta USB.</translation>
     </message>
@@ -2007,22 +2049,22 @@ uscire</translation>
         <translation>Troppe prove in poco tempo: riprova fra un minuto</translation>
     </message>
     <message>
-        <location filename="../src/carlink/CarlinkDongle.cpp" line="223" />
+        <location filename="../src/carlink/CarlinkDongle.cpp" line="249" />
         <source>USB not available</source>
         <translation>USB non disponibile</translation>
     </message>
     <message>
-        <location filename="../src/carlink/CarlinkDongle.cpp" line="255" />
+        <location filename="../src/carlink/CarlinkDongle.cpp" line="281" />
         <source>The dongle is not responding</source>
         <translation>Il dongle non risponde</translation>
     </message>
     <message>
-        <location filename="../src/carlink/CarlinkDongle.cpp" line="274" />
+        <location filename="../src/carlink/CarlinkDongle.cpp" line="300" />
         <source>Missing USB permissions for the dongle</source>
         <translation>Permessi USB mancanti per il dongle</translation>
     </message>
     <message>
-        <location filename="../src/carlink/CarlinkDongle.cpp" line="452" />
+        <location filename="../src/carlink/CarlinkDongle.cpp" line="478" />
         <source>Phone</source>
         <translation>Telefono</translation>
     </message>
@@ -2657,13 +2699,13 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="141" />
-        <location filename="../qml/Settings.qml" line="1847" />
+        <location filename="../qml/Settings.qml" line="1869" />
         <source>System</source>
         <translation>Sistema</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="141" />
-        <location filename="../qml/Settings.qml" line="1995" />
+        <location filename="../qml/Settings.qml" line="2017" />
         <source>Updates</source>
         <translation>Aggiornamenti</translation>
     </message>
@@ -2903,8 +2945,8 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="182" />
-        <location filename="../qml/Settings.qml" line="1923" />
-        <location filename="../qml/Settings.qml" line="1928" />
+        <location filename="../qml/Settings.qml" line="1945" />
+        <location filename="../qml/Settings.qml" line="1950" />
         <source>On-screen keyboard</source>
         <translation>Tastiera virtuale</translation>
     </message>
@@ -2915,7 +2957,7 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="183" />
-        <location filename="../qml/Settings.qml" line="2214" />
+        <location filename="../qml/Settings.qml" line="2236" />
         <source>Keyboard languages</source>
         <translation>Lingue tastiera</translation>
     </message>
@@ -2926,7 +2968,7 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="184" />
-        <location filename="../qml/Settings.qml" line="1963" />
+        <location filename="../qml/Settings.qml" line="1985" />
         <source>Debug</source>
         <translation>Debug</translation>
     </message>
@@ -3002,20 +3044,20 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="513" />
-        <location filename="../qml/Settings.qml" line="1662" />
+        <location filename="../qml/Settings.qml" line="1684" />
         <source>Light</source>
         <translation>Chiaro</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="513" />
-        <location filename="../qml/Settings.qml" line="1662" />
+        <location filename="../qml/Settings.qml" line="1684" />
         <source>Dark</source>
         <translation>Scuro</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="513" />
         <location filename="../qml/Settings.qml" line="1488" />
-        <location filename="../qml/Settings.qml" line="1724" />
+        <location filename="../qml/Settings.qml" line="1746" />
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
@@ -3072,13 +3114,13 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="692" />
-        <location filename="../qml/Settings.qml" line="2477" />
+        <location filename="../qml/Settings.qml" line="2499" />
         <source>rgba(255, 255, 255, 1.0)</source>
         <translation type="unfinished" />
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="693" />
-        <location filename="../qml/Settings.qml" line="2477" />
+        <location filename="../qml/Settings.qml" line="2499" />
         <source>rgba(255, 255, 255, 0.0)</source>
         <translation type="unfinished" />
     </message>
@@ -3144,7 +3186,7 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="1181" />
-        <location filename="../qml/Settings.qml" line="2575" />
+        <location filename="../qml/Settings.qml" line="2597" />
         <source>Save</source>
         <translation>Salva</translation>
     </message>
@@ -3205,9 +3247,9 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="1514" />
-        <location filename="../qml/Settings.qml" line="1662" />
-        <location filename="../qml/Settings.qml" line="1680" />
-        <location filename="../qml/Settings.qml" line="1694" />
+        <location filename="../qml/Settings.qml" line="1684" />
+        <location filename="../qml/Settings.qml" line="1702" />
+        <location filename="../qml/Settings.qml" line="1716" />
         <source>Automatic</source>
         <translation>Automatico</translation>
     </message>
@@ -3248,389 +3290,424 @@ Avvia un episodio dalla Home o dalla ricerca</translation>
     </message>
     <message>
         <location filename="../qml/Settings.qml" line="1657" />
+        <source>Connection</source>
+        <translation>Connessione</translation>
+    </message>
+    <message>
+        <location filename="../qml/Settings.qml" line="1662" />
+        <source>Carlinkit dongle</source>
+        <translation>Dongle Carlinkit</translation>
+    </message>
+    <message>
+        <location filename="../qml/Settings.qml" line="1662" />
+        <source>Android Auto: USB cable</source>
+        <translation>Android Auto: cavo USB</translation>
+    </message>
+    <message>
+        <location filename="../qml/Settings.qml" line="1662" />
+        <source>Android Auto: Wi-Fi</source>
+        <translation>Android Auto: Wi-Fi</translation>
+    </message>
+    <message>
+        <location filename="../qml/Settings.qml" line="1669" />
+        <source>Android Auto without a dongle: plug the phone into a USB port of this computer. Android only; CarPlay needs the dongle.</source>
+        <translation>Android Auto senza dongle: collega il telefono a una porta USB di questo computer. Solo Android; CarPlay richiede il dongle.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Settings.qml" line="1671" />
+        <source>Android Auto without a dongle, over Wi-Fi. Needs Bluetooth and a Wi-Fi adapter that can create a network. Android only; CarPlay needs the dongle.</source>
+        <translation>Android Auto senza dongle, via Wi-Fi. Servono il Bluetooth e una scheda Wi-Fi che sappia creare una rete. Solo Android; CarPlay richiede il dongle.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Settings.qml" line="1672" />
+        <source>CarPlay and Android Auto through a Carlinkit dongle plugged into a USB port.</source>
+        <translation>CarPlay e Android Auto tramite un dongle Carlinkit collegato a una porta USB.</translation>
+    </message>
+    <message>
+        <location filename="../qml/Settings.qml" line="1679" />
         <source>Theme</source>
         <translation>Tema</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1668" />
+        <location filename="../qml/Settings.qml" line="1690" />
         <source>Applies immediately. "Automatic" follows this interface's light/dark theme.</source>
         <translation>Si applica subito. "Automatico" segue il tema chiaro/scuro di questa interfaccia.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1675" />
+        <location filename="../qml/Settings.qml" line="1697" />
         <source>Fit in the small panel</source>
         <translation>Adattamento nel pannello piccolo</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1680" />
-        <location filename="../qml/Settings.qml" line="1694" />
+        <location filename="../qml/Settings.qml" line="1702" />
+        <location filename="../qml/Settings.qml" line="1716" />
         <source>Fill</source>
         <translation>Riempi</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1686" />
+        <location filename="../qml/Settings.qml" line="1708" />
         <source>The video is always 16:9. "Automatic" shows it whole with two bars; "Fill" stretches it to the edges (it distorts a little).</source>
         <translation>Il video è sempre 16:9. "Automatico" lo mostra intero con due barre; "Riempi" lo allunga fino ai bordi (si deforma un po').</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1691" />
+        <location filename="../qml/Settings.qml" line="1713" />
         <source>Fullscreen fit</source>
         <translation>Adattamento a schermo intero</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1701" />
+        <location filename="../qml/Settings.qml" line="1723" />
         <source>Resolution</source>
         <translation>Risoluzione</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1712" />
+        <location filename="../qml/Settings.qml" line="1734" />
         <source>1080p is the sharpest; 720p and 480p are lighter on the computer. Android Auto only accepts these three sizes.</source>
         <translation>1080p è la più nitida; 720p e 480p pesano meno sul computer. Android Auto accetta solo queste tre misure.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1719" />
+        <location filename="../qml/Settings.qml" line="1741" />
         <source>Density (DPI)</source>
         <translation>Densità (DPI)</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1730" />
+        <location filename="../qml/Settings.qml" line="1752" />
         <source>Auto chooses based on the resolution (240 at 1080p). Lower = more content on screen, small icons and text; higher = everything bigger.</source>
         <translation>Auto sceglie in base alla risoluzione (240 a 1080p). Più basso = più contenuto sullo schermo, icone e testi piccoli; più alto = tutto più grande.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1740" />
+        <location filename="../qml/Settings.qml" line="1762" />
         <source>Reconnect the phone</source>
         <translation>Riconnetti il telefono</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1745" />
+        <location filename="../qml/Settings.qml" line="1767" />
         <source>Resolution and DPI apply on reconnection (it starts by itself when you change them)</source>
         <translation>Risoluzione e DPI si applicano alla riconnessione (parte da sola quando li cambi)</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1755" />
+        <location filename="../qml/Settings.qml" line="1777" />
         <source>Choose the cover</source>
         <translation>Scegli la copertina</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1755" />
+        <location filename="../qml/Settings.qml" line="1777" />
         <source>Choose the hero image</source>
         <translation>Scegli l'immagine hero</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1756" />
+        <location filename="../qml/Settings.qml" line="1778" />
         <source>Images (*.png *.jpg *.jpeg *.webp)</source>
         <translation>Immagini (*.png *.jpg *.jpeg *.webp)</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1769" />
+        <location filename="../qml/Settings.qml" line="1791" />
         <source>Choose which ones to show in the Arcade. Games you add in Bottles appear here by themselves.</source>
         <translation>Scegli quali mostrare nell'Arcade. I giochi che aggiungi in Bottles compaiono qui da soli.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1827" />
+        <location filename="../qml/Settings.qml" line="1849" />
         <source>Bottles · </source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1849" />
+        <location filename="../qml/Settings.qml" line="1871" />
         <source>System information and tools — section being expanded.</source>
         <translation>Informazioni e strumenti di sistema — sezione in ampliamento.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1855" />
+        <location filename="../qml/Settings.qml" line="1877" />
         <source>3D car</source>
         <translation>Auto 3D</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1858" />
+        <location filename="../qml/Settings.qml" line="1880" />
         <source>Load another model in place of the current one, or redo the setup of doors, hood, trunk, wheels and color.</source>
         <translation>Carica un altro modello al posto di quello attuale, oppure rifai la configurazione di portiere, cofano, baule, ruote e colore.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1863" />
+        <location filename="../qml/Settings.qml" line="1885" />
         <source>Load new model</source>
         <translation>Carica nuovo modello</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1864" />
+        <location filename="../qml/Settings.qml" line="1886" />
         <source>Repeat setup</source>
         <translation>Ripeti configurazione</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1869" />
+        <location filename="../qml/Settings.qml" line="1891" />
         <source>Performance</source>
         <translation>Prestazioni</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1874" />
+        <location filename="../qml/Settings.qml" line="1896" />
         <source>Low performance mode</source>
         <translation>Modalità basse prestazioni</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1877" />
+        <location filename="../qml/Settings.qml" line="1899" />
         <source>Removes the car reflection, panel blurs and other heavy effects: the UI gets lighter on less powerful computers</source>
         <translation>Toglie il riflesso dell'auto, gli sfocati dei pannelli e altri effetti pesanti: la UI diventa più leggera sui computer meno potenti</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1890" />
+        <location filename="../qml/Settings.qml" line="1912" />
         <source>Language</source>
         <translation>Lingua</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1901" />
+        <location filename="../qml/Settings.qml" line="1923" />
         <source>Connected services</source>
         <translation>Servizi collegati</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1906" />
+        <location filename="../qml/Settings.qml" line="1928" />
         <source>Guided setup</source>
         <translation>Configurazione guidata</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1909" />
+        <location filename="../qml/Settings.qml" line="1931" />
         <source>Connect or change maps, search, weather and Spotify, step by step</source>
         <translation>Collega o cambia mappe, ricerca, meteo e Spotify, passo per passo</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1916" />
+        <location filename="../qml/Settings.qml" line="1938" />
         <source>Open</source>
         <translation>Apri</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1931" />
+        <location filename="../qml/Settings.qml" line="1953" />
         <source>Show the on-screen keyboard when you tap a text field</source>
         <translation>Mostra la tastiera a schermo quando tocchi un campo di testo</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1946" />
+        <location filename="../qml/Settings.qml" line="1968" />
         <source>Select keyboard languages</source>
         <translation>Seleziona lingue tastiera</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1950" />
+        <location filename="../qml/Settings.qml" line="1972" />
         <source> selected  ↗</source>
         <translation> selezionate  ↗</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1957" />
+        <location filename="../qml/Settings.qml" line="1979" />
         <source>The languages enabled here appear in the menu that opens when you tap the globe icon 🌐 on the keyboard</source>
         <translation>Le lingue attivate qui compaiono nel menu che si apre toccando l'icona del mondo 🌐 sulla tastiera</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1965" />
+        <location filename="../qml/Settings.qml" line="1987" />
         <source>Open terminal</source>
         <translation>Apri terminale</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1984" />
+        <location filename="../qml/Settings.qml" line="2006" />
         <source>Could not reach GitHub. Check the internet connection and try again.</source>
         <translation>Impossibile raggiungere GitHub. Controlla la connessione a internet e riprova.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1985" />
+        <location filename="../qml/Settings.qml" line="2007" />
         <source>No release has been published yet.</source>
         <translation>Non è ancora stata pubblicata nessuna versione.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1986" />
+        <location filename="../qml/Settings.qml" line="2008" />
         <source>The new release has no AppImage to download.</source>
         <translation>La nuova versione non ha un AppImage da scaricare.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1987" />
+        <location filename="../qml/Settings.qml" line="2009" />
         <source>Not enough free space to download the update.</source>
         <translation>Spazio libero insufficiente per scaricare l'aggiornamento.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1988" />
+        <location filename="../qml/Settings.qml" line="2010" />
         <source>Could not save the update on the disk.</source>
         <translation>Impossibile salvare l'aggiornamento sul disco.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1989" />
+        <location filename="../qml/Settings.qml" line="2011" />
         <source>The downloaded file is damaged: nothing was changed. Try again.</source>
         <translation>Il file scaricato è danneggiato: non è stato cambiato nulla. Riprova.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1991" />
+        <location filename="../qml/Settings.qml" line="2013" />
         <source>Something went wrong with the update.</source>
         <translation>Qualcosa è andato storto con l'aggiornamento.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="1999" />
+        <location filename="../qml/Settings.qml" line="2021" />
         <source>Installed version</source>
         <translation>Versione installata</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2009" />
+        <location filename="../qml/Settings.qml" line="2031" />
         <source>Looking for updates…</source>
         <translation>Cerco aggiornamenti…</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2010" />
+        <location filename="../qml/Settings.qml" line="2032" />
         <source>Volta OS is up to date.</source>
         <translation>Volta OS è aggiornato.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2011" />
+        <location filename="../qml/Settings.qml" line="2033" />
         <source>Version %1 is available.</source>
         <translation>È disponibile la versione %1.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2012" />
+        <location filename="../qml/Settings.qml" line="2034" />
         <source>Downloading version %1…</source>
         <translation>Scarico la versione %1…</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2013" />
+        <location filename="../qml/Settings.qml" line="2035" />
         <source>Version %1 is installed. Restart Volta OS to start using it.</source>
         <translation>La versione %1 è installata. Riavvia Volta OS per usarla.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2022" />
+        <location filename="../qml/Settings.qml" line="2044" />
         <source>Download size: %1 MB</source>
         <translation>Dimensione del download: %1 MB</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2043" />
+        <location filename="../qml/Settings.qml" line="2065" />
         <source>What's new</source>
         <translation>Novità</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2065" />
+        <location filename="../qml/Settings.qml" line="2087" />
         <source>This copy was not started from the AppImage, so it cannot update itself. Download the new version from the releases page.</source>
         <translation>Questa copia non è stata avviata dall'AppImage, quindi non può aggiornarsi da sola. Scarica la nuova versione dalla pagina delle release.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2073" />
+        <location filename="../qml/Settings.qml" line="2095" />
         <source>Install update</source>
         <translation>Installa aggiornamento</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2078" />
+        <location filename="../qml/Settings.qml" line="2100" />
         <source>Open releases page</source>
         <translation>Apri la pagina delle release</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2083" />
+        <location filename="../qml/Settings.qml" line="2105" />
         <source>Restart now</source>
         <translation>Riavvia ora</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2093" />
+        <location filename="../qml/Settings.qml" line="2115" />
         <source>Check again</source>
         <translation>Controlla di nuovo</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2100" />
+        <location filename="../qml/Settings.qml" line="2122" />
         <source>Your settings, keys and sign-ins are kept. The new version is checked before it replaces the old one: if the download is interrupted, nothing changes.</source>
         <translation>Impostazioni, chiavi e accessi restano invariati. La nuova versione viene controllata prima di sostituire la vecchia: se il download si interrompe, non cambia nulla.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2134" />
+        <location filename="../qml/Settings.qml" line="2156" />
         <source>Select preset</source>
         <translation>Seleziona preimpostazione</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2172" />
+        <location filename="../qml/Settings.qml" line="2194" />
         <source>+ Create new preset...</source>
         <translation>+ Crea nuova preimpostazione...</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2225" />
+        <location filename="../qml/Settings.qml" line="2247" />
         <source>At least one language always stays active</source>
         <translation>Almeno una lingua resta sempre attiva</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2279" />
+        <location filename="../qml/Settings.qml" line="2301" />
         <source>Automatic theme</source>
         <translation>Tema automatico</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2290" />
+        <location filename="../qml/Settings.qml" line="2312" />
         <source>The dark theme turns on during the chosen time range</source>
         <translation>Il tema scuro si attiva nella fascia oraria scelta</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2298" />
+        <location filename="../qml/Settings.qml" line="2320" />
         <source>DARK FROM</source>
         <translation>SCURO DALLE</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2308" />
+        <location filename="../qml/Settings.qml" line="2330" />
         <source>TO</source>
         <translation>ALLE</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2088" />
-        <location filename="../qml/Settings.qml" line="2321" />
-        <location filename="../qml/Settings.qml" line="2572" />
+        <location filename="../qml/Settings.qml" line="2110" />
+        <location filename="../qml/Settings.qml" line="2343" />
+        <location filename="../qml/Settings.qml" line="2594" />
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2323" />
+        <location filename="../qml/Settings.qml" line="2345" />
         <source>Done</source>
         <translation>Fine</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2400" />
+        <location filename="../qml/Settings.qml" line="2422" />
         <source>Ambient light color</source>
         <translation>Colore luci ambientali</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2535" />
+        <location filename="../qml/Settings.qml" line="2557" />
         <source>New preset</source>
         <translation>Nuova preimpostazione</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2547" />
+        <location filename="../qml/Settings.qml" line="2569" />
         <source>Save the current equalization with a name, to recall it whenever you like.</source>
         <translation>Salva l'equalizzazione di adesso con un nome, per richiamarla quando vuoi.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2564" />
+        <location filename="../qml/Settings.qml" line="2586" />
         <source>E.g. Rock, Deep bass…</source>
         <translation>Es. Rock, Bassi profondi…</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2618" />
+        <location filename="../qml/Settings.qml" line="2640" />
         <source>Output device</source>
         <translation>Dispositivo di uscita</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2618" />
+        <location filename="../qml/Settings.qml" line="2640" />
         <source>Input device</source>
         <translation>Dispositivo d'ingresso</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2651" />
+        <location filename="../qml/Settings.qml" line="2673" />
         <source>No device found</source>
         <translation>Nessun dispositivo trovato</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2680" />
+        <location filename="../qml/Settings.qml" line="2702" />
         <source>Cover: vertical image (e.g. 600×900). Hero: wide image for the big picture.</source>
         <translation>Copertina: immagine verticale (es. 600×900). Hero: immagine larga per la foto grande.</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2683" />
+        <location filename="../qml/Settings.qml" line="2705" />
         <source>Cover</source>
         <translation>Copertina</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2683" />
+        <location filename="../qml/Settings.qml" line="2705" />
         <source>Hero</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2697" />
+        <location filename="../qml/Settings.qml" line="2719" />
         <source>Reset</source>
         <translation>Ripristina</translation>
     </message>
     <message>
-        <location filename="../qml/Settings.qml" line="2704" />
+        <location filename="../qml/Settings.qml" line="2726" />
         <source>Close</source>
         <translation>Chiudi</translation>
     </message>

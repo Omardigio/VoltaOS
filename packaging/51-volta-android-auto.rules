@@ -1,0 +1,10 @@
+# Volta OS: lets the logged-in user talk to an Android phone over USB, which native (wired)
+# Android Auto needs to switch the phone to "accessory" mode.
+#   sudo cp 51-volta-android-auto.rules /etc/udev/rules.d/ && sudo udevadm control --reload && sudo udevadm trigger
+# then unplug and plug the phone again.
+
+# a phone already in accessory mode
+SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", ATTR{idProduct}=="2d0[0145]", TAG+="uaccess"
+# a phone that shows up as ADB (ff/42/01) or as a camera/MTP device (06/01/01)
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{ID_USB_INTERFACES}=="*:ff4201:*", TAG+="uaccess"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{ID_USB_INTERFACES}=="*:060101:*", TAG+="uaccess"

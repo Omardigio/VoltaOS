@@ -54,6 +54,9 @@ something that is not here, please [open an issue](https://github.com/Omardigio/
 - The whole documentation and interface text were translated to English; some labels or translations
   (Spanish, French, Portuguese) can still be missing or wrong.
 
+- **Android Auto without a dongle** is new: the USB cable mode has been tried with one phone only, and
+  the Wi-Fi mode does not connect by itself yet (see [the guide](app/carplay-androidauto.md#android-auto-without-a-dongle)).
+
 ## Help me improve it
 
 The most useful thing you can do is tell me **what does not work and what you would like to see**: open an

@@ -104,7 +104,17 @@ Rectangle {
 
     readonly property bool busy: Carlink.state === "starting" || Carlink.state === "connecting"
                                  || (Carlink.state === "running" && !Carlink.videoActive)
+    readonly property bool noDongle: Carlink.source !== "dongle"
     readonly property string title: {
+        if (noDongle) {
+            switch (Carlink.state) {
+            case "starting":   return qsTr("Preparing the phone…")
+            case "connecting": return qsTr("Connecting to Android Auto…")
+            case "running":    return qsTr("Starting…")
+            case "error":      return Carlink.detail === "permission" ? qsTr("Cannot reach the phone") : qsTr("Android Auto problem")
+            default:           return Carlink.source === "wireless" ? qsTr("Waiting for your phone") : qsTr("Connect your phone")
+            }
+        }
         switch (Carlink.state) {
         case "starting":   return qsTr("Starting the dongle…")
         case "waiting":    return qsTr("Connect your phone")
@@ -115,6 +125,20 @@ Rectangle {
         }
     }
     readonly property string subtitle: {
+        if (noDongle) {
+            switch (Carlink.state) {
+            case "error":
+                return Carlink.detail === "permission"
+                       ? qsTr("Volta OS is not allowed to use the phone over USB. Install the udev rule from the documentation (51-volta-android-auto.rules), then unplug the phone and plug it in again.")
+                       : Carlink.detail
+            case "searching":
+            case "off":
+                return Carlink.source === "wireless"
+                       ? qsTr("Waiting for your phone to connect over Wi-Fi.")
+                       : qsTr("Plug your Android phone into a USB port with a data cable. The Android Auto app must be installed.")
+            default: return ""
+            }
+        }
         switch (Carlink.state) {
         case "waiting":    return qsTr("Turn on Bluetooth on your phone and connect it to the dongle: CarPlay or Android Auto start by themselves.")
         case "error":      return Carlink.detail

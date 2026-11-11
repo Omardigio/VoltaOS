@@ -1654,6 +1654,28 @@ Rectangle {
                 visible: root.pageIdx === 7
                 width: parent.width; spacing: 24
 
+                SectionTitle { title: qsTr("Connection") }
+                Column {
+                    width: parent.width; spacing: 10
+                    TSegmented {
+                        width: 560
+                        options: [qsTr("Carlinkit dongle"), qsTr("Android Auto: USB cable"), qsTr("Android Auto: Wi-Fi")]
+                        current: Carlink.source === "usb" ? 1 : Carlink.source === "wireless" ? 2 : 0
+                        onPicked: idx => Carlink.source = ["dongle", "usb", "wireless"][idx]
+                    }
+                    Text {
+                        width: parent.width
+                        text: Carlink.source === "usb"
+                              ? qsTr("Android Auto without a dongle: plug the phone into a USB port of this computer. Android only; CarPlay needs the dongle.")
+                              : Carlink.source === "wireless"
+                                ? qsTr("Android Auto without a dongle, over Wi-Fi. Needs Bluetooth and a Wi-Fi adapter that can create a network. Android only; CarPlay needs the dongle.")
+                                : qsTr("CarPlay and Android Auto through a Carlinkit dongle plugged into a USB port.")
+                        color: root.txtHint; font.pixelSize: 12; wrapMode: Text.WordWrap
+                    }
+                }
+
+                TDivider {}
+
                 SectionTitle { title: qsTr("Theme") }
                 Column {
                     width: parent.width; spacing: 10

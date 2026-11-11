@@ -9,6 +9,9 @@ cmake_minimum_required(VERSION 3.16)
 # problem in a test environment.
 project(VoltaOS VERSION 1.0 LANGUAGES CXX C)
 
+# The project uses a Qt private module on purpose (diagnostic probe): no warning at every configure.
+set(QT_NO_PRIVATE_MODULE_WARNING ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

@@ -730,7 +730,30 @@ No route found§Nessun percorso trovato§§§
 System check§Controllo del sistema§§§
 Volta OS needs a few programs and Python libraries. Without the ones marked as required the interface will not work at 100%: some features (music, maps, phone, Wi-Fi…) will be missing or limited. Install what is missing with the commands below, then tap Check again.§Volta OS ha bisogno di alcuni programmi e librerie Python. Senza quelli segnati come obbligatori l'interfaccia non funzionerà al 100%: alcune funzioni (musica, mappe, telefono, Wi-Fi…) mancheranno o saranno limitate. Installa ciò che manca con i comandi qui sotto, poi tocca Controlla di nuovo.§§§
 Everything required is installed.§Tutto ciò che serve è installato.§§§
-Check again§Controlla di nuovo§§§
+Check again§Controlla di nuovo§Comprobar de nuevo§Vérifier à nouveau§Verificar novamente
 Missing§Mancante§§§
 Not installed§Non installato§§§
  of § di §§§
+Updates§Aggiornamenti§Actualizaciones§Mises à jour§Atualizações
+Check for updates§Cerca aggiornamenti§Buscar actualizaciones§Rechercher des mises à jour§Procurar atualizações
+update updates upgrade version new release download install§aggiornamento aggiornamenti aggiorna versione nuova release scarica installa§actualizar actualizaciones actualización versión nueva descargar instalar§mise à jour mises à jour version nouvelle télécharger installer§atualizar atualização atualizações versão nova baixar instalar
+Could not reach GitHub. Check the internet connection and try again.§Impossibile raggiungere GitHub. Controlla la connessione a internet e riprova.§No se pudo conectar con GitHub. Comprueba la conexión a internet e inténtalo de nuevo.§Impossible de joindre GitHub. Vérifiez la connexion internet et réessayez.§Não foi possível acessar o GitHub. Verifique a conexão com a internet e tente novamente.
+No release has been published yet.§Non è ancora stata pubblicata nessuna versione.§Todavía no se ha publicado ninguna versión.§Aucune version n'a encore été publiée.§Nenhuma versão foi publicada ainda.
+The new release has no AppImage to download.§La nuova versione non ha un AppImage da scaricare.§La nueva versión no tiene ningún AppImage para descargar.§La nouvelle version n'a pas d'AppImage à télécharger.§A nova versão não tem um AppImage para baixar.
+Not enough free space to download the update.§Spazio libero insufficiente per scaricare l'aggiornamento.§No hay espacio libre suficiente para descargar la actualización.§Pas assez d'espace libre pour télécharger la mise à jour.§Espaço livre insuficiente para baixar a atualização.
+Could not save the update on the disk.§Impossibile salvare l'aggiornamento sul disco.§No se pudo guardar la actualización en el disco.§Impossible d'enregistrer la mise à jour sur le disque.§Não foi possível salvar a atualização no disco.
+The downloaded file is damaged: nothing was changed. Try again.§Il file scaricato è danneggiato: non è stato cambiato nulla. Riprova.§El archivo descargado está dañado: no se ha cambiado nada. Inténtalo de nuevo.§Le fichier téléchargé est endommagé : rien n'a été modifié. Réessayez.§O arquivo baixado está corrompido: nada foi alterado. Tente novamente.
+Something went wrong with the update.§Qualcosa è andato storto con l'aggiornamento.§Algo salió mal con la actualización.§Un problème est survenu pendant la mise à jour.§Algo deu errado com a atualização.
+Installed version§Versione installata§Versión instalada§Version installée§Versão instalada
+Looking for updates…§Cerco aggiornamenti…§Buscando actualizaciones…§Recherche de mises à jour…§Procurando atualizações…
+Volta OS is up to date.§Volta OS è aggiornato.§Volta OS está actualizado.§Volta OS est à jour.§O Volta OS está atualizado.
+Version %1 is available.§È disponibile la versione %1.§Hay una versión %1 disponible.§La version %1 est disponible.§A versão %1 está disponível.
+Downloading version %1…§Scarico la versione %1…§Descargando la versión %1…§Téléchargement de la version %1…§Baixando a versão %1…
+Version %1 is installed. Restart Volta OS to start using it.§La versione %1 è installata. Riavvia Volta OS per usarla.§La versión %1 está instalada. Reinicia Volta OS para usarla.§La version %1 est installée. Redémarrez Volta OS pour l'utiliser.§A versão %1 está instalada. Reinicie o Volta OS para usá-la.
+Download size: %1 MB§Dimensione del download: %1 MB§Tamaño de la descarga: %1 MB§Taille du téléchargement : %1 Mo§Tamanho do download: %1 MB
+What's new§Novità§Novedades§Nouveautés§Novidades
+This copy was not started from the AppImage, so it cannot update itself. Download the new version from the releases page.§Questa copia non è stata avviata dall'AppImage, quindi non può aggiornarsi da sola. Scarica la nuova versione dalla pagina delle release.§Esta copia no se inició desde el AppImage, así que no puede actualizarse sola. Descarga la nueva versión desde la página de versiones.§Cette copie n'a pas été lancée depuis l'AppImage, elle ne peut donc pas se mettre à jour seule. Téléchargez la nouvelle version depuis la page des versions.§Esta cópia não foi iniciada a partir do AppImage, então não pode se atualizar sozinha. Baixe a nova versão na página de versões.
+Install update§Installa aggiornamento§Instalar actualización§Installer la mise à jour§Instalar atualização
+Open releases page§Apri la pagina delle release§Abrir la página de versiones§Ouvrir la page des versions§Abrir a página de versões
+Restart now§Riavvia ora§Reiniciar ahora§Redémarrer maintenant§Reiniciar agora
+Your settings, keys and sign-ins are kept. The new version is checked before it replaces the old one: if the download is interrupted, nothing changes.§Impostazioni, chiavi e accessi restano invariati. La nuova versione viene controllata prima di sostituire la vecchia: se il download si interrompe, non cambia nulla.§Tus ajustes, claves e inicios de sesión se conservan. La nueva versión se comprueba antes de sustituir a la anterior: si la descarga se interrumpe, no cambia nada.§Vos réglages, clés et connexions sont conservés. La nouvelle version est vérifiée avant de remplacer l'ancienne : si le téléchargement est interrompu, rien ne change.§Suas configurações, chaves e logins são mantidos. A nova versão é verificada antes de substituir a antiga: se o download for interrompido, nada muda.

@@ -14,5 +14,6 @@ The pages, in the order of the side menu:
 | [Apps and Arcade](apps-arcade.md) | hide apps, choose games and their covers |
 | [CarPlay / Android Auto](carplay-android-auto.md) | theme, fit, resolution, DPI |
 | [System](system.md) | 3D car, performance, language, connected services, keyboard, debug |
+| [Updates](updates.md) | look for a new version and install it with one click |
 
 Changes apply immediately and are saved automatically.

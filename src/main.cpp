@@ -36,6 +36,7 @@
 #include "GpsService.h"
 #include "CarlinkDongle.h"
 #include "SetupManager.h"
+#include "UpdateManager.h"
 #include "MprisManager.h"
 #include "FileHelper.h"
 #ifdef VOLTA_HAS_DIRTYPROBE
@@ -518,6 +519,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("Gps", &gps);
     engine.rootContext()->setContextProperty("Carlink", &carlink);
     engine.rootContext()->setContextProperty("Setup", &setup);
+    static UpdateManager updates;   // Settings > Updates (new AppImage from GitHub)
+    engine.rootContext()->setContextProperty("Updates", &updates);
     static CarModelManager carModels(projectDir());   // auto 3D (.glb) dell'utente
     engine.rootContext()->setContextProperty("CarModels", &carModels);
     if (qEnvironmentVariableIsSet("VOLTA_CARDEBUG")) { const auto r = carModels.inspect(carModels.carFile()); qDebug() << "[auto]" << carModels.carFile() << r["ok"] << r["error"] << r["count"] << r["parts"]; }

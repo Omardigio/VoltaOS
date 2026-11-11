@@ -138,12 +138,12 @@ Rectangle {
     }
 
     property int pageIdx: 0
-    property var pages: [qsTr("Display"), qsTr("Lights"), "Audio", qsTr("Navigation"), qsTr("Network"), qsTr("Bluetooth"), qsTr("App"), qsTr("CarPlay / Android Auto"), "Arcade", qsTr("System")]
+    property var pages: [qsTr("Display"), qsTr("Lights"), "Audio", qsTr("Navigation"), qsTr("Network"), qsTr("Bluetooth"), qsTr("App"), qsTr("CarPlay / Android Auto"), "Arcade", qsTr("System"), qsTr("Updates")]
     // the Arcade (set by AppPanel): list of games, hidden ones and quick launch
     property var arcade: null
     // Material Symbols icons to the left of the menu entries (same order as "pages")
     readonly property var pageIcons: ["desktop_windows", "lightbulb", "volume_up", "near_me", "wifi",
-                                      "bluetooth", "apps", "directions_car", "sports_esports", "settings"]
+                                      "bluetooth", "apps", "directions_car", "sports_esports", "settings", "system_update"]
     // Audio page tab to open (0 Devices, 1 Equalizer,
     // 2 Balance) — used by the mini player's EQ button
     property int audioTabRequest: -1
@@ -182,6 +182,7 @@ Rectangle {
         { t: qsTr("On-screen keyboard"), p: 9, k: qsTr("keyboard virtual screen text") },
         { t: qsTr("Keyboard languages"), p: 9, k: qsTr("keyboard languages language layout") },
         { t: qsTr("Debug"), p: 9, k: qsTr("debug system information tools") },
+        { t: qsTr("Check for updates"), p: 10, k: qsTr("update updates upgrade version new release download install") },
         { t: qsTr("Android Auto: theme"), p: 7, k: qsTr("android auto carplay theme") },
         { t: qsTr("Android Auto: screen fit"), p: 7, k: qsTr("android auto carplay fit fill adapt fullscreen") },
         { t: qsTr("Android Auto: resolution"), p: 7, k: qsTr("android auto resolution 480p 720p 1080p") },
@@ -1967,6 +1968,137 @@ Rectangle {
                         "command -v \"$t\" >/dev/null 2>&1 && { setsid \"$t\" >/tmp/terminal.log 2>&1 & disown; exit 0; }; " +
                         "done; echo 'no terminal found in PATH' > /tmp/terminal.log"
                     ])
+                }
+            }
+
+            // ══════ PAGE: UPDATES ══════
+            Column {
+                id: updatesPage
+                visible: root.pageIdx === 10
+                width: parent.width; spacing: 18
+                // looks for a new version the first time the page is opened
+                onVisibleChanged: if (visible && Updates.state === "idle") Updates.check()
+
+                readonly property string errorText: {
+                    switch (Updates.errorCode) {
+                    case "network":   return qsTr("Could not reach GitHub. Check the internet connection and try again.")
+                    case "norelease": return qsTr("No release has been published yet.")
+                    case "noasset":   return qsTr("The new release has no AppImage to download.")
+                    case "nospace":   return qsTr("Not enough free space to download the update.")
+                    case "write":     return qsTr("Could not save the update on the disk.")
+                    case "badfile":   return qsTr("The downloaded file is damaged: nothing was changed. Try again.")
+                    }
+                    return qsTr("Something went wrong with the update.")
+                }
+                readonly property bool busy: Updates.state === "checking" || Updates.state === "downloading"
+
+                SectionTitle { title: qsTr("Updates") }
+
+                Row {
+                    spacing: 8
+                    Text { text: qsTr("Installed version"); color: root.txtSub; font.pixelSize: 14 }
+                    Text { text: Updates.currentVersion; color: root.txt; font.pixelSize: 14; font.weight: Font.DemiBold }
+                }
+
+                Text {
+                    width: parent.width; wrapMode: Text.WordWrap
+                    color: Updates.state === "error" ? "#E5484D" : root.txt
+                    font.pixelSize: 16; font.weight: Font.DemiBold
+                    text: {
+                        switch (Updates.state) {
+                        case "checking":    return qsTr("Looking for updates…")
+                        case "uptodate":    return qsTr("Volta OS is up to date.")
+                        case "available":   return qsTr("Version %1 is available.").arg(Updates.latestVersion)
+                        case "downloading": return qsTr("Downloading version %1…").arg(Updates.latestVersion)
+                        case "ready":       return qsTr("Version %1 is installed. Restart Volta OS to start using it.").arg(Updates.latestVersion)
+                        case "error":       return updatesPage.errorText
+                        }
+                        return ""
+                    }
+                }
+
+                Text {
+                    visible: Updates.state === "available" && Updates.downloadSize > 0
+                    text: qsTr("Download size: %1 MB").arg(Math.round(Updates.downloadSize / 1048576))
+                    color: root.txtHint; font.pixelSize: 12
+                }
+
+                // download progress
+                Column {
+                    visible: Updates.state === "downloading"
+                    width: parent.width; spacing: 6
+                    Rectangle {
+                        width: parent.width; height: 8; radius: 4; color: root.ctrlBg
+                        Rectangle {
+                            width: parent.width * Updates.progress; height: parent.height; radius: 4; color: root.blue
+                        }
+                    }
+                    Text { text: Math.round(Updates.progress * 100) + " %"; color: root.txtSub; font.pixelSize: 12 }
+                }
+
+                // release notes
+                Column {
+                    visible: (Updates.state === "available" || Updates.state === "ready") && Updates.notes !== ""
+                    width: parent.width; spacing: 8
+                    Text { text: qsTr("What's new"); color: root.txt; font.pixelSize: 15 }
+                    Rectangle {
+                        width: parent.width; height: Math.min(220, notesText.implicitHeight + 24); radius: 8
+                        color: root.ctrlBg
+                        Flickable {
+                            anchors.fill: parent; anchors.margins: 12
+                            contentHeight: notesText.implicitHeight
+                            clip: true; boundsBehavior: Flickable.StopAtBounds
+                            Text {
+                                id: notesText
+                                width: parent.width
+                                text: Updates.notes; textFormat: Text.MarkdownText
+                                wrapMode: Text.WordWrap; color: root.txtSub; font.pixelSize: 13
+                            }
+                        }
+                    }
+                }
+
+                // a source build or a copy that is not an AppImage cannot replace itself
+                Text {
+                    visible: Updates.state === "available" && !Updates.canInstall
+                    width: parent.width; wrapMode: Text.WordWrap
+                    text: qsTr("This copy was not started from the AppImage, so it cannot update itself. Download the new version from the releases page.")
+                    color: root.txtSub; font.pixelSize: 13
+                }
+
+                Flow {
+                    width: parent.width; spacing: 12
+                    TPrimary {
+                        visible: Updates.state === "available" && Updates.canInstall
+                        label: qsTr("Install update")
+                        onClicked: Updates.install()
+                    }
+                    TPrimary {
+                        visible: Updates.state === "available" && !Updates.canInstall
+                        label: qsTr("Open releases page")
+                        onClicked: Qt.openUrlExternally(Updates.releasePage)
+                    }
+                    TPrimary {
+                        visible: Updates.state === "ready"
+                        label: qsTr("Restart now")
+                        onClicked: Updates.restart()
+                    }
+                    TSecondary {
+                        visible: Updates.state === "downloading"
+                        label: qsTr("Cancel")
+                        onClicked: Updates.cancel()
+                    }
+                    TSecondary {
+                        visible: !updatesPage.busy && Updates.state !== "ready"
+                        label: qsTr("Check again")
+                        onClicked: Updates.check()
+                    }
+                }
+
+                Text {
+                    width: parent.width; wrapMode: Text.WordWrap
+                    text: qsTr("Your settings, keys and sign-ins are kept. The new version is checked before it replaces the old one: if the download is interrupted, nothing changes.")
+                    color: root.txtHint; font.pixelSize: 12
                 }
             }
         }

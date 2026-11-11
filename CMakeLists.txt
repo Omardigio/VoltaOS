@@ -48,6 +48,8 @@ qt_add_executable(VoltaOS
     src/core/SystemHelper.cpp
     src/core/SetupManager.cpp
     src/core/SetupManager.h
+    src/core/UpdateManager.cpp
+    src/core/UpdateManager.h
     src/core/LanguageManager.cpp
     src/core/CarModelManager.cpp
     src/core/ServiceManager.cpp
@@ -311,6 +313,7 @@ qt_add_qml_module(VoltaOS
         assets/icons/ms_volume_up.svg
         assets/icons/ms_near_me.svg
         assets/icons/ms_wifi.svg
+        assets/icons/ms_system_update.svg
         assets/icons/ms_bluetooth.svg
         assets/icons/ms_apps.svg
         assets/icons/ms_settings.svg assets/icons/ms_check.svg assets/icons/ms_sports_esports.svg
@@ -481,6 +484,8 @@ if(TARGET Qt6::QuickPrivate)
     target_compile_definitions(VoltaOS PRIVATE VOLTA_HAS_DIRTYPROBE)
 endif()
 target_link_libraries(VoltaOS PRIVATE Qt6::OpenGL)
+# version shown in Settings > Updates and compared with the latest GitHub release
+target_compile_definitions(VoltaOS PRIVATE VOLTA_VERSION="${PROJECT_VERSION}")
 
 # CarPlay / Android Auto via dongle Carlinkit (src/carlink): USB, decoder H.264, audio e video Qt
 find_package(Qt6 REQUIRED COMPONENTS Multimedia)

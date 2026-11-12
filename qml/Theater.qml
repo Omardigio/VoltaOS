@@ -64,6 +64,7 @@ Rectangle {
         try { var l = JSON.parse(svcPrefs.json); if (Array.isArray(l)) return l } catch (e) {}
         return theater.defaultServices
     }
+    readonly property int maxApps: 9
     property bool editMode: false
     property bool addOpen: false
     function saveServices(l) { svcPrefs.json = JSON.stringify(l) }
@@ -73,7 +74,7 @@ Rectangle {
     }
     function addService(addr) {
         var t = String(addr || "").trim()
-        if (t === "") return false
+        if (t === "" || services.length >= maxApps) return false
         if (t.indexOf("://") < 0) t = "https://" + t
         var host = (t.split("://")[1] || "").split("/")[0].replace(/^www\./i, "")
         if (host.indexOf(".") < 0 || host.indexOf(" ") >= 0) return false
@@ -176,6 +177,11 @@ Rectangle {
         boundsBehavior: Flickable.StopAtBounds
         clip: true
 
+        MouseArea {
+            width: launcher.width; height: launcher.contentHeight
+            onClicked: theater.editMode = false
+        }
+
         Column {
             id: contentCol
             width: Math.min(launcher.width - 60, 1100)
@@ -206,37 +212,83 @@ Rectangle {
                 }
             }
 
-            // ── Griglia servizi ──────────────────────────────────────────
-            Grid {
+            // ── Griglia servizi (max 9, trascinabili) ────────────────────
+            Item {
                 id: grid
                 width: parent.width
-                columns: 3
-                columnSpacing: 22
-                rowSpacing: 22
                 anchors.horizontalCenter: parent.horizontalCenter
+                readonly property int columns: 3
+                readonly property real gap: 22
+                readonly property real cellW: (width - gap * (columns - 1)) / columns
+                readonly property real cellH: cellW * 0.55
+                readonly property int slots: theater.services.length + ((theater.editMode && theater.services.length < theater.maxApps) ? 1 : 0)
+                height: Math.ceil(slots / columns) * cellH + (Math.ceil(slots / columns) - 1) * gap
 
-                readonly property real cellW: (width - columnSpacing * (columns - 1)) / columns
+                // order while dragging (list of keys); empty = order of services
+                property var dragOrder: []
+                function slotOf(key, idx) {
+                    if (dragOrder.length === 0) return idx
+                    var s = dragOrder.indexOf(key)
+                    return s < 0 ? idx : s
+                }
+                function slotX(s) { return (s % columns) * (cellW + gap) }
+                function slotY(s) { return Math.floor(s / columns) * (cellH + gap) }
+                function commitOrder() {
+                    if (dragOrder.length === 0) return
+                    var byKey = {}
+                    theater.services.forEach(function(x) { byKey[x.key] = x })
+                    var l = dragOrder.map(function(k) { return byKey[k] }).filter(function(x) { return !!x })
+                    dragOrder = []
+                    theater.saveServices(l)
+                }
 
                 Repeater {
                     model: theater.services
 
                     Rectangle {
                         id: tile
+                        readonly property int slot: grid.slotOf(modelData.key, index)
+                        property bool dragging: false
+                        property real dragX: 0
+                        property real dragY: 0
+                        property color logoColor: "#111111"
+                        property bool hasLogoColor: false
                         width: grid.cellW
-                        height: grid.cellW * 0.55
+                        height: grid.cellH
+                        x: dragging ? dragX : grid.slotX(slot)
+                        y: dragging ? dragY : grid.slotY(slot)
+                        z: dragging ? 10 : 1
+                        scale: dragging ? 1.06 : 1
                         radius: 10
-                        color: tileArea.pressed ? (lightTheme ? "#EDEDED" : "#1C1C1C") : (lightTheme ? "#FFFFFF" : "#111111")
+                        color: (modelData.custom && hasLogoColor)
+                               ? (lightTheme ? Qt.lighter(logoColor, 1.0) : Qt.darker(logoColor, 2.4))
+                               : (tileArea.pressed ? (lightTheme ? "#EDEDED" : "#1C1C1C") : (lightTheme ? "#FFFFFF" : "#111111"))
                         border.width: 1
                         border.color: lightTheme ? "#DDDDDD" : "#242424"
 
-                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Behavior on x { enabled: !tile.dragging; NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+                        Behavior on y { enabled: !tile.dragging; NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+                        Behavior on scale { NumberAnimation { duration: 140 } }
+                        Behavior on color { ColorAnimation { duration: 200 } }
+
+                        // edit mode: wobble like the phone home screens
+                        transformOrigin: Item.Center
+                        SequentialAnimation on rotation {
+                            running: theater.editMode && !tile.dragging
+                            loops: Animation.Infinite
+                            alwaysRunToEnd: true
+                            PauseAnimation { duration: (index * 37) % 90 }
+                            NumberAnimation { to: -1.6; duration: 110; easing.type: Easing.InOutSine }
+                            NumberAnimation { to: 1.6; duration: 220; easing.type: Easing.InOutSine }
+                            NumberAnimation { to: 0; duration: 110; easing.type: Easing.InOutSine }
+                        }
 
                         // Banner: YOUR image from volta_os/assets/theater/<key>.png
                         Image {
                             id: banner
                             anchors.fill: parent
                             anchors.margins: 1
-                            source: theater.bannerBase + modelData.key + ".png"
+                            source: modelData.custom ? "" : theater.bannerBase + modelData.key + ".png"
                             fillMode: Image.PreserveAspectCrop
                             visible: status === Image.Ready
                             smooth: true
@@ -251,6 +303,7 @@ Rectangle {
                             id: siteIcon
                             visible: !!modelData.custom && status === Image.Ready
                             anchors.centerIn: parent
+                            anchors.verticalCenterOffset: -8
                             height: parent.height * 0.42; width: height
                             source: modelData.custom ? "http://127.0.0.1:9098/webapp-icon?url=" + encodeURIComponent(modelData.url) : ""
                             sourceSize: Qt.size(256, 256)
@@ -261,8 +314,40 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.bottom: parent.bottom; anchors.bottomMargin: 10
                             text: modelData.name
-                            color: lightTheme ? "#171717" : "#F0F0F0"
+                            color: "#FFFFFF"
+                            style: Text.Outline; styleColor: "#55000000"
                             font.pixelSize: 16
+                        }
+
+                        // The tile takes the dominant colour of the logo
+                        Canvas {
+                            id: colorProbe
+                            width: 24; height: 24
+                            visible: false
+                            renderTarget: Canvas.Image
+                            Component.onCompleted: if (modelData.custom) loadImage(siteIcon.source)
+                            onImageLoaded: requestPaint()
+                            onPaint: {
+                                if (!modelData.custom || !isImageLoaded(siteIcon.source)) return
+                                var ctx = getContext("2d")
+                                ctx.clearRect(0, 0, width, height)
+                                ctx.drawImage(siteIcon.source, 0, 0, width, height)
+                                var d = ctx.getImageData(0, 0, width, height).data
+                                var r = 0, g = 0, b = 0, w = 0, ar = 0, ag = 0, ab = 0, an = 0
+                                for (var i = 0; i < d.length; i += 4) {
+                                    var a = d[i + 3] / 255
+                                    if (a < 0.5) continue
+                                    var mx = Math.max(d[i], d[i+1], d[i+2]), mn = Math.min(d[i], d[i+1], d[i+2])
+                                    var sat = mx === 0 ? 0 : (mx - mn) / mx
+                                    var wt = sat * sat * a
+                                    r += d[i] * wt; g += d[i+1] * wt; b += d[i+2] * wt; w += wt
+                                    ar += d[i]; ag += d[i+1]; ab += d[i+2]; an++
+                                }
+                                if (w > 1) tile.logoColor = Qt.rgba(r / w / 255, g / w / 255, b / w / 255, 1)
+                                else if (an > 0) tile.logoColor = Qt.rgba(ar / an / 255, ag / an / 255, ab / an / 255, 1)
+                                else return
+                                tile.hasLogoColor = true
+                            }
                         }
 
                         // Placeholder (service name) if the image is missing
@@ -289,17 +374,56 @@ Rectangle {
                         MouseArea {
                             id: tileArea
                             anchors.fill: parent
-                            onClicked: if (theater.editMode) theater.editMode = false
-                                       else theater.openService(modelData.url, modelData.name, modelData.key)
-                            onPressAndHold: theater.editMode = true
+                            property bool held: false
+                            property bool moved: false
+                            property real grabX: 0
+                            property real grabY: 0
+                            onPressed: function(m) { held = false; moved = false; grabX = m.x; grabY = m.y }
+                            onPressAndHold: { held = true; theater.editMode = true }
+                            onPositionChanged: function(m) {
+                                if (!pressed || !theater.editMode) return
+                                var p = tileArea.mapToItem(grid, m.x, m.y)
+                                if (!tile.dragging) {
+                                    if (Math.abs(m.x - grabX) + Math.abs(m.y - grabY) < 10) return
+                                    var order = []
+                                    theater.services.forEach(function(x) { order.push(x.key) })
+                                    grid.dragOrder = order
+                                    tile.dragging = true
+                                    moved = true
+                                }
+                                tile.dragX = p.x - grabX
+                                tile.dragY = p.y - grabY
+                                var cx = tile.dragX + tile.width / 2, cy = tile.dragY + tile.height / 2
+                                var col = Math.max(0, Math.min(grid.columns - 1, Math.floor(cx / (grid.cellW + grid.gap))))
+                                var row = Math.max(0, Math.floor(cy / (grid.cellH + grid.gap)))
+                                var target = Math.min(row * grid.columns + col, theater.services.length - 1)
+                                var cur = grid.dragOrder.indexOf(modelData.key)
+                                if (target !== cur) {
+                                    var o = grid.dragOrder.slice()
+                                    o.splice(cur, 1)
+                                    o.splice(target, 0, modelData.key)
+                                    grid.dragOrder = o
+                                }
+                            }
+                            onReleased: {
+                                if (tile.dragging) { tile.dragging = false; grid.commitOrder() }
+                            }
+                            onCanceled: if (tile.dragging) { tile.dragging = false; grid.commitOrder() }
+                            onClicked: {
+                                if (held || moved) return
+                                if (theater.editMode) theater.editMode = false
+                                else theater.openService(modelData.url, modelData.name, modelData.key)
+                            }
                         }
 
                         // edit mode: same circle with "x" as the drawer's web apps
                         Rectangle {
-                            visible: theater.editMode
                             x: -width / 3; y: -height / 3
                             width: 26; height: width; radius: width / 2
                             color: _tDelMA.pressed ? "#8E8E93" : "#AEAEB2"
+                            visible: scale > 0.01
+                            scale: theater.editMode ? 1 : 0
+                            Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
                             Repeater {
                                 model: [45, -45]
                                 Rectangle {
@@ -313,14 +437,23 @@ Rectangle {
                     }
                 }
 
-                // "+" silhouette next to the last icon: add a custom app
+                // "+" silhouette next to the last icon: edit mode only, and only below the maximum
                 Rectangle {
+                    id: plusTile
+                    readonly property bool shown: theater.editMode && theater.services.length < theater.maxApps
+                    x: grid.slotX(theater.services.length)
+                    y: grid.slotY(theater.services.length)
                     width: grid.cellW
-                    height: grid.cellW * 0.55
+                    height: grid.cellH
                     radius: 10
                     color: "transparent"
                     border.width: 2
                     border.color: lightTheme ? "#BBBBBB" : "#3A3A3A"
+                    visible: opacity > 0.01
+                    opacity: shown ? 1 : 0
+                    scale: shown ? 1 : 0.8
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                    Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
                     Text {
                         anchors.centerIn: parent
                         text: "+"
@@ -329,7 +462,8 @@ Rectangle {
                     }
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: { theater.editMode = false; addField.text = ""; addErr.visible = false; theater.addOpen = true; addField.forceActiveFocus() }
+                        enabled: plusTile.shown
+                        onClicked: { addField.text = ""; addErr.visible = false; theater.addOpen = true; addField.forceActiveFocus() }
                     }
                 }
             }

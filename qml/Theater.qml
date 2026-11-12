@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Window
+import QtCore as Core
 import QtWebEngine
 import Qt5Compat.GraphicalEffects
 import VoltaApp 1.0
@@ -10,11 +11,8 @@ import VoltaApp 1.0
 // (or changing the `banner` property of each service) and the labels will disappear.
 Rectangle {
     id: theater
-    // Gradiente launcher: 262626 in alto → nero puro in basso
-    gradient: Gradient {
-        GradientStop { position: 0.0; color: lightTheme ? "#F5F5F5" : "#262626" }
-        GradientStop { position: 1.0; color: lightTheme ? "#E6E6E6" : "#000000" }
-    }
+    // Same background as Toybox and Arcade
+    color: lightTheme ? "#FFFFFF" : "#171717"
     clip: true
 
     property bool lightTheme: false
@@ -42,20 +40,51 @@ Rectangle {
     signal switchToToybox()
 
     // When the app is no longer active, return to the launcher and unload the webview
-    onActiveChanged: if (!active) currentUrl = ""
+    onActiveChanged: if (!active) { currentUrl = ""; editMode = false; addOpen = false }
 
     // ── Servizi ────────────────────────────────────────────────────────────
     // The banners are images ON DISK in the volta_os/assets/theater/ folder:
     // youtube.png, netflix.png, prime.png, disney.png, paramount.png
     // Replace those files with YOUR images (same name) and they will appear here.
     readonly property string bannerBase: appUrl + "/assets/theater/"
-    property var services: [
+    // Saved list (default services + the ones the user adds). Each: {key,name,url,accent,custom}
+    readonly property var defaultServices: [
         { key: "youtube",   name: "YouTube",     url: "https://m.youtube.com/",        accent: "#FF0000" },
         { key: "netflix",   name: "Netflix",     url: "https://www.netflix.com",       accent: "#E50914" },
         { key: "prime",     name: "Prime Video", url: "https://www.primevideo.com",    accent: "#1FA2FF" },
         { key: "disney",    name: "Disney+",     url: "https://www.disneyplus.com",    accent: "#2A6DF4" },
         { key: "paramount", name: "Paramount+",  url: "https://www.paramountplus.com", accent: "#0064FF" }
     ]
+    Core.Settings {
+        id: svcPrefs
+        category: "theater"
+        property string json: ""
+    }
+    property var services: {
+        try { var l = JSON.parse(svcPrefs.json); if (Array.isArray(l)) return l } catch (e) {}
+        return theater.defaultServices
+    }
+    property bool editMode: false
+    property bool addOpen: false
+    function saveServices(l) { svcPrefs.json = JSON.stringify(l) }
+    function removeService(key) {
+        saveServices(services.filter(function(x) { return x.key !== key }))
+        if (services.length <= 1) editMode = false
+    }
+    function addService(addr) {
+        var t = String(addr || "").trim()
+        if (t === "") return false
+        if (t.indexOf("://") < 0) t = "https://" + t
+        var host = (t.split("://")[1] || "").split("/")[0].replace(/^www\./i, "")
+        if (host.indexOf(".") < 0 || host.indexOf(" ") >= 0) return false
+        var parts = host.split(".")
+        var nm = parts.length >= 2 ? parts[parts.length - 2] : parts[0]
+        nm = nm.charAt(0).toUpperCase() + nm.slice(1)
+        var l = services.slice()
+        l.push({ key: "c" + Date.now().toString(36), name: nm, url: t, accent: "#8A8A8A", custom: true })
+        saveServices(l)
+        return true
+    }
 
     // Emitted instead of opening the webview: AppPanel catches it (leftover
     // from the Waydroid era — today the handler in AppPanel.qml is empty, but the
@@ -217,11 +246,30 @@ Rectangle {
                             }
                         }
 
+                        // Custom app: site icon fetched automatically (apple-touch-icon / favicon)
+                        Image {
+                            id: siteIcon
+                            visible: !!modelData.custom && status === Image.Ready
+                            anchors.centerIn: parent
+                            height: parent.height * 0.42; width: height
+                            source: modelData.custom ? "http://127.0.0.1:9098/webapp-icon?url=" + encodeURIComponent(modelData.url) : ""
+                            sourceSize: Qt.size(256, 256)
+                            fillMode: Image.PreserveAspectFit; smooth: true; mipmap: true; asynchronous: true
+                        }
+                        Text {
+                            visible: !!modelData.custom && siteIcon.status === Image.Ready
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: parent.bottom; anchors.bottomMargin: 10
+                            text: modelData.name
+                            color: lightTheme ? "#171717" : "#F0F0F0"
+                            font.pixelSize: 16
+                        }
+
                         // Placeholder (service name) if the image is missing
                         Column {
                             anchors.centerIn: parent
                             spacing: 10
-                            visible: !banner.visible
+                            visible: !banner.visible && !(modelData.custom && siteIcon.status === Image.Ready)
 
                             Rectangle {
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -241,8 +289,123 @@ Rectangle {
                         MouseArea {
                             id: tileArea
                             anchors.fill: parent
-                            onClicked: theater.openService(modelData.url, modelData.name, modelData.key)
+                            onClicked: if (theater.editMode) theater.editMode = false
+                                       else theater.openService(modelData.url, modelData.name, modelData.key)
+                            onPressAndHold: theater.editMode = true
                         }
+
+                        // edit mode: same circle with "x" as the drawer's web apps
+                        Rectangle {
+                            visible: theater.editMode
+                            x: -width / 3; y: -height / 3
+                            width: 26; height: width; radius: width / 2
+                            color: _tDelMA.pressed ? "#8E8E93" : "#AEAEB2"
+                            Repeater {
+                                model: [45, -45]
+                                Rectangle {
+                                    anchors.centerIn: parent
+                                    width: parent.width * 0.46; height: 2; radius: 1
+                                    color: "#FFFFFF"; rotation: modelData; antialiasing: true
+                                }
+                            }
+                            MouseArea { id: _tDelMA; anchors.fill: parent; anchors.margins: -8; onClicked: theater.removeService(modelData.key) }
+                        }
+                    }
+                }
+
+                // "+" silhouette next to the last icon: add a custom app
+                Rectangle {
+                    width: grid.cellW
+                    height: grid.cellW * 0.55
+                    radius: 10
+                    color: "transparent"
+                    border.width: 2
+                    border.color: lightTheme ? "#BBBBBB" : "#3A3A3A"
+                    Text {
+                        anchors.centerIn: parent
+                        text: "+"
+                        color: lightTheme ? "#888888" : "#6A6A6A"
+                        font.pixelSize: 56; font.weight: Font.Light
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: { theater.editMode = false; addField.text = ""; addErr.visible = false; theater.addOpen = true; addField.forceActiveFocus() }
+                    }
+                }
+            }
+        }
+    }
+
+    // ── Popup: address of the custom Theater app ──
+    Rectangle {
+        anchors.fill: parent
+        visible: theater.addOpen
+        color: "#99000000"
+        z: 100
+        MouseArea { anchors.fill: parent; onClicked: theater.addOpen = false }
+        Rectangle {
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 60, 520)
+            height: popCol.height + 48
+            radius: 16
+            color: lightTheme ? "#FFFFFF" : "#262626"
+            border.width: 1; border.color: lightTheme ? "#DDDDDD" : "#3A3A3A"
+            MouseArea { anchors.fill: parent }
+            Column {
+                id: popCol
+                anchors.centerIn: parent
+                width: parent.width - 48
+                spacing: 14
+                Text {
+                    text: qsTr("Add a Theater app")
+                    color: lightTheme ? "#171717" : "#FFFFFF"
+                    font.pixelSize: 22; font.weight: Font.DemiBold
+                }
+                Text {
+                    width: parent.width
+                    text: qsTr("Type the web address of the site (e.g. raiplay.it). The icon is found automatically.")
+                    color: lightTheme ? "#555555" : "#A2A3A5"
+                    font.pixelSize: 14; wrapMode: Text.WordWrap
+                }
+                Rectangle {
+                    width: parent.width; height: 44; radius: 10
+                    color: lightTheme ? "#F0F0F0" : "#171717"
+                    border.width: 1; border.color: lightTheme ? "#DDDDDD" : "#3A3A3A"
+                    TextInput {
+                        id: addField
+                        anchors.fill: parent; anchors.margins: 12
+                        verticalAlignment: TextInput.AlignVCenter
+                        color: lightTheme ? "#171717" : "#FFFFFF"
+                        font.pixelSize: 16; clip: true; selectByMouse: true
+                        inputMethodHints: Qt.ImhUrlCharactersOnly | Qt.ImhNoPredictiveText
+                        onAccepted: addBtn.go()
+                    }
+                }
+                Text {
+                    id: addErr
+                    visible: false
+                    text: qsTr("Invalid address")
+                    color: "#E5484D"; font.pixelSize: 13
+                }
+                Row {
+                    anchors.right: parent.right
+                    spacing: 12
+                    Rectangle {
+                        width: 110; height: 40; radius: 10
+                        color: lightTheme ? "#E6E6E6" : "#3A3A3A"
+                        Text { anchors.centerIn: parent; text: qsTr("Cancel"); color: lightTheme ? "#171717" : "#FFFFFF"; font.pixelSize: 15 }
+                        MouseArea { anchors.fill: parent; onClicked: theater.addOpen = false }
+                    }
+                    Rectangle {
+                        id: addBtn
+                        width: 110; height: 40; radius: 10
+                        color: "#3E6AE1"
+                        function go() {
+                            if (theater.addService(addField.text)) theater.addOpen = false
+                            else addErr.visible = true
+                        }
+                        Text { anchors.centerIn: parent; text: qsTr("Add"); color: "#FFFFFF"; font.pixelSize: 15; font.weight: Font.DemiBold }
+                        MouseArea { anchors.fill: parent; onClicked: addBtn.go() }
                     }
                 }
             }

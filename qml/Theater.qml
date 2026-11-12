@@ -417,6 +417,40 @@ Rectangle {
                     }
                 }
             }
+
+            // ── Hint: how to edit (discoverability) / "Done" button in edit mode ──
+            Item {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width; height: 40
+                Text {
+                    anchors.centerIn: parent
+                    opacity: theater.editMode ? 0 : 1
+                    visible: opacity > 0.01
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                    text: qsTr("Hold an app to edit, reorder or add")
+                    color: lightTheme ? "#8A8A8A" : "#6E6E73"
+                    font.pixelSize: 14; font.letterSpacing: 0.3
+                }
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 18
+                    opacity: theater.editMode ? 1 : 0
+                    visible: opacity > 0.01
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("Drag to reorder")
+                        color: lightTheme ? "#8A8A8A" : "#6E6E73"
+                        font.pixelSize: 14
+                    }
+                    Rectangle {
+                        width: 96; height: 36; radius: 18
+                        color: lightTheme ? "#E6E6E6" : "#333336"
+                        Text { anchors.centerIn: parent; text: qsTr("Done"); color: lightTheme ? "#171717" : "#FFFFFF"; font.pixelSize: 15; font.weight: Font.DemiBold }
+                        MouseArea { anchors.fill: parent; anchors.margins: -6; onClicked: theater.editMode = false }
+                    }
+                }
+            }
         }
     }
 

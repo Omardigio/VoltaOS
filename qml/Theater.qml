@@ -251,39 +251,26 @@ Rectangle {
                         property bool dragging: false
                         property real dragX: 0
                         property real dragY: 0
-                        property color logoColor: "#111111"
-                        property bool hasLogoColor: false
                         width: grid.cellW
                         height: grid.cellH
                         x: dragging ? dragX : grid.slotX(slot)
                         y: dragging ? dragY : grid.slotY(slot)
                         z: dragging ? 10 : 1
-                        scale: dragging ? 1.06 : 1
+                        scale: dragging ? 1.04 : (theater.editMode ? 0.955 : 1)
                         radius: 10
-                        color: (modelData.custom && hasLogoColor)
-                               ? (lightTheme ? Qt.lighter(logoColor, 1.0) : Qt.darker(logoColor, 2.4))
-                               : (tileArea.pressed ? (lightTheme ? "#EDEDED" : "#1C1C1C") : (lightTheme ? "#FFFFFF" : "#111111"))
-                        border.width: 1
-                        border.color: lightTheme ? "#DDDDDD" : "#242424"
+                        color: tileArea.pressed ? (lightTheme ? "#EDEDED" : "#1C1C1C") : (lightTheme ? "#FFFFFF" : "#111111")
+                        border.width: theater.editMode ? 2 : 1
+                        border.color: theater.editMode ? (lightTheme ? "#8E8E93" : "#5A5A5E") : (lightTheme ? "#DDDDDD" : "#242424")
 
+                        Behavior on border.color { ColorAnimation { duration: 250 } }
                         Behavior on x { enabled: !tile.dragging; NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
                         Behavior on y { enabled: !tile.dragging; NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
-                        Behavior on scale { NumberAnimation { duration: 140 } }
+                        Behavior on scale { NumberAnimation { duration: 280; easing.type: Easing.OutCubic } }
                         Behavior on color { ColorAnimation { duration: 200 } }
 
-                        // edit mode: wobble like the phone home screens
-                        transformOrigin: Item.Center
-                        SequentialAnimation on rotation {
-                            running: theater.editMode && !tile.dragging
-                            loops: Animation.Infinite
-                            alwaysRunToEnd: true
-                            PauseAnimation { duration: (index * 37) % 90 }
-                            NumberAnimation { to: -1.6; duration: 110; easing.type: Easing.InOutSine }
-                            NumberAnimation { to: 1.6; duration: 220; easing.type: Easing.InOutSine }
-                            NumberAnimation { to: 0; duration: 110; easing.type: Easing.InOutSine }
-                        }
-
-                        // Banner: YOUR image from volta_os/assets/theater/<key>.png
+                        // edit mode (Tesla style): the tile settles back slightly and its border lights up
+        transformOrigin: Item.Center
+        // Banner: YOUR image from volta_os/assets/theater/<key>.png
                         Image {
                             id: banner
                             anchors.fill: parent
@@ -298,59 +285,22 @@ Rectangle {
                             }
                         }
 
-                        // Custom app: site icon fetched automatically (apple-touch-icon / favicon)
-                        Image {
-                            id: siteIcon
-                            visible: !!modelData.custom && status === Image.Ready
-                            anchors.centerIn: parent
-                            anchors.verticalCenterOffset: -8
-                            height: parent.height * 0.42; width: height
-                            source: modelData.custom ? "http://127.0.0.1:9098/webapp-icon?url=" + encodeURIComponent(modelData.url) : ""
-                            sourceSize: Qt.size(256, 256)
-                            fillMode: Image.PreserveAspectFit; smooth: true; mipmap: true; asynchronous: true
-                        }
-                        Text {
-                            visible: !!modelData.custom && siteIcon.status === Image.Ready
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottom: parent.bottom; anchors.bottomMargin: 10
-                            text: modelData.name
-                            color: "#FFFFFF"
-                            style: Text.Outline; styleColor: "#55000000"
-                            font.pixelSize: 16
-                        }
+                        // Custom app: ready-made card (logo on its own colour), built by the service
+        Image {
+            id: siteIcon
+            visible: !!modelData.custom && status === Image.Ready
+            anchors.fill: parent
+            anchors.margins: 1
+            source: modelData.custom ? "http://127.0.0.1:9098/webapp-card?url=" + encodeURIComponent(modelData.url) : ""
+            fillMode: Image.PreserveAspectCrop
+            smooth: true; asynchronous: true
+            layer.enabled: true
+            layer.effect: OpacityMask {
+                maskSource: Rectangle { width: siteIcon.width; height: siteIcon.height; radius: 8 }
+            }
+        }
 
-                        // The tile takes the dominant colour of the logo
-                        Canvas {
-                            id: colorProbe
-                            width: 24; height: 24
-                            visible: false
-                            renderTarget: Canvas.Image
-                            Component.onCompleted: if (modelData.custom) loadImage(siteIcon.source)
-                            onImageLoaded: requestPaint()
-                            onPaint: {
-                                if (!modelData.custom || !isImageLoaded(siteIcon.source)) return
-                                var ctx = getContext("2d")
-                                ctx.clearRect(0, 0, width, height)
-                                ctx.drawImage(siteIcon.source, 0, 0, width, height)
-                                var d = ctx.getImageData(0, 0, width, height).data
-                                var r = 0, g = 0, b = 0, w = 0, ar = 0, ag = 0, ab = 0, an = 0
-                                for (var i = 0; i < d.length; i += 4) {
-                                    var a = d[i + 3] / 255
-                                    if (a < 0.5) continue
-                                    var mx = Math.max(d[i], d[i+1], d[i+2]), mn = Math.min(d[i], d[i+1], d[i+2])
-                                    var sat = mx === 0 ? 0 : (mx - mn) / mx
-                                    var wt = sat * sat * a
-                                    r += d[i] * wt; g += d[i+1] * wt; b += d[i+2] * wt; w += wt
-                                    ar += d[i]; ag += d[i+1]; ab += d[i+2]; an++
-                                }
-                                if (w > 1) tile.logoColor = Qt.rgba(r / w / 255, g / w / 255, b / w / 255, 1)
-                                else if (an > 0) tile.logoColor = Qt.rgba(ar / an / 255, ag / an / 255, ab / an / 255, 1)
-                                else return
-                                tile.hasLogoColor = true
-                            }
-                        }
-
-                        // Placeholder (service name) if the image is missing
+        // Placeholder (service name) if the image is missing
                         Column {
                             anchors.centerIn: parent
                             spacing: 10

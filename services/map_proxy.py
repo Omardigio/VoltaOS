@@ -1805,16 +1805,15 @@ def game_art_custom(key, kind):
 # (128 px). Downloaded once and saved in data/webapp_icons: visible even offline.
 _WEBAPP_ICONS = _PROJECT / 'data' / 'webapp_icons'
 
-@app.route('/webapp-icon')
-def webapp_icon():
-    u = (request.args.get('url') or '').strip()
-    host = (urllib.parse.urlparse(u if '://' in u else 'https://' + u).hostname or '').lower()
-    if not host:
-        return Response(status=400)
+def _webapp_icon_image(host):
+    """Site icon as RGBA image (cached in data/webapp_icons), None if not found."""
     name = host.replace(':', '_') + '.png'
     f = _WEBAPP_ICONS / name
     if f.exists():
-        return send_from_directory(_WEBAPP_ICONS, name, max_age=86400)
+        try:
+            return Image.open(f).convert('RGBA')
+        except Exception:
+            pass
     base = 'https://' + host
     best = None                        # the largest icon among the sources is kept
     for src in (base + '/apple-touch-icon.png', base + '/apple-touch-icon-precomposed.png',
@@ -1834,9 +1833,79 @@ def webapp_icon():
             if best.width >= 144:
                 break
     if best is None:
-        return Response(status=404)
+        return None
     _WEBAPP_ICONS.mkdir(parents=True, exist_ok=True)
     best.save(f, format='PNG')
+    return best
+
+def _host_of(u):
+    return (urllib.parse.urlparse(u if '://' in u else 'https://' + u).hostname or '').lower()
+
+@app.route('/webapp-icon')
+def webapp_icon():
+    host = _host_of((request.args.get('url') or '').strip())
+    if not host:
+        return Response(status=400)
+    if _webapp_icon_image(host) is None:
+        return Response(status=404)
+    return send_from_directory(_WEBAPP_ICONS, host.replace(':', '_') + '.png', max_age=86400)
+
+def _dominant_color(im):
+    """Most 'colourful' average colour of the logo (grey average if it has none)."""
+    small = im.resize((32, 32))
+    r = g = b = w = 0.0
+    ar = ag = ab = an = 0
+    for (pr, pg, pb, pa) in small.getdata():
+        if pa < 128:
+            continue
+        mx, mn = max(pr, pg, pb), min(pr, pg, pb)
+        sat = 0 if mx == 0 else (mx - mn) / mx
+        wt = sat * sat
+        r += pr * wt; g += pg * wt; b += pb * wt; w += wt
+        ar += pr; ag += pg; ab += pb; an += 1
+    if w > 1:
+        return (int(r / w), int(g / w), int(b / w))
+    if an:
+        return (ar // an, ag // an, ab // an)
+    return (40, 40, 40)
+
+@app.route('/webapp-card')
+def webapp_card():
+    """Ready-made 'card' (16:9) for a site: its logo centred on a gradient made
+    from the logo's own colour. Saved in data/webapp_icons/<host>.card.png."""
+    host = _host_of((request.args.get('url') or '').strip())
+    if not host:
+        return Response(status=400)
+    name = host.replace(':', '_') + '.card.png'
+    if not (_WEBAPP_ICONS / name).exists():
+        icon = _webapp_icon_image(host)
+        if icon is None:
+            return Response(status=404)
+        W, H = 640, 352
+        # Opaque square icon with a flat background (apple-touch-icon): the card
+        # takes that very colour so the logo blends in; otherwise a darkened
+        # version of the logo's dominant colour.
+        corners = [icon.getpixel(pt) for pt in ((1, 1), (icon.width - 2, 1), (1, icon.height - 2), (icon.width - 2, icon.height - 2))]
+        flat = all(c[3] > 240 and max(abs(c[i] - corners[0][i]) for i in range(3)) < 12 for c in corners)
+        if flat:
+            cr, cg, cb = corners[0][:3]
+            top = bot = (cr, cg, cb)
+        else:
+            cr, cg, cb = _dominant_color(icon)
+            top = (int(cr * 0.62), int(cg * 0.62), int(cb * 0.62))
+            bot = (int(cr * 0.26), int(cg * 0.26), int(cb * 0.26))
+        card = Image.new('RGB', (W, H))
+        px = card.load()
+        for y in range(H):
+            t = y / (H - 1)
+            row = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
+            for x in range(W):
+                px[x, y] = row
+        side = int(H * 0.5)
+        logo = icon.resize((side, side), Image.LANCZOS)
+        card.paste(logo, ((W - side) // 2, (H - side) // 2), logo)
+        _WEBAPP_ICONS.mkdir(parents=True, exist_ok=True)
+        card.save(_WEBAPP_ICONS / name, format='PNG')
     return send_from_directory(_WEBAPP_ICONS, name, max_age=86400)
 
 @app.route('/qr.svg')
